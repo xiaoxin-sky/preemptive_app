@@ -11,4 +11,7 @@ export default defineConfig({
       resolvers: [NaiveUiResolver()],
     }),
   ],
+  server: {
+    port: 33331,
+  },
 });
