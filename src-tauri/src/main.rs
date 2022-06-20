@@ -3,9 +3,10 @@
     windows_subsystem = "windows"
 )]
 
+use serde::{Deserialize, Serialize};
 use tauri::{generate_context, Manager};
 
-use crate::manage::manage::start_ssr_local;
+use crate::manage::{config::Config, manage::start_ssr_local};
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     message: String,
@@ -15,13 +16,33 @@ mod manage;
 mod rpc;
 mod ssh;
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct SaveConfigPalLoad {
+    access_key_id: String,
+    access_key_secret: String,
+    release_time: String,
+    password: String,
+}
+
 fn main() {
     let context = generate_context!();
 
     tauri::Builder::default()
         .setup(|app| {
-            let id = app.listen_global("onOff", move |event| {
-                println!("收到事件{:?}", event.payload().unwrap());
+            let id = app.listen_global("saveConfig", |event| {
+                let payLoad: SaveConfigPalLoad =
+                    serde_json::from_str(event.payload().unwrap()).unwrap();
+                println!("收到事件 {:?}", payLoad);
+                let mut config = Config::new();
+                config.init(
+                    payLoad.access_key_id,
+                    payLoad.access_key_secret,
+                    payLoad.release_time,
+                    payLoad.password,
+                )
+            });
+            let id = app.listen_global("onOff", |event| {
+                println!("收到事件{:?}", event);
                 let payLoad = event.payload().unwrap();
 
                 match payLoad {

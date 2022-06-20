@@ -1,50 +1,28 @@
 <script setup lang="ts">
 import { appWindow } from "@tauri-apps/api/window";
-import { onMounted } from "vue";
-
-enum OnOff {
-  open = "open",
-  close = "close",
+import { ref } from "vue";
+import Options from "./components/Options.vue";
+import { IConfig } from "./components/Setup.vue";
+interface Config {
+  access_key_id: string;
+  access_key_secret: string;
+  release_time: string;
+  password: string;
 }
 
-const optionHandle = (type: OnOff) => {
-  appWindow.emit("onOff", type);
-};
+const config_storage = ref(localStorage.getItem("config"));
 
-onMounted(() => {
-  appWindow.listen("setup_ok", (v) => {
-    console.log(v);
-  });
-});
+const saveHandle = (val: IConfig) => {
+  let newVal = JSON.stringify(val);
+  localStorage.setItem("config", newVal);
+  config_storage.value = newVal;
+  appWindow.emit("saveConfig", val);
+};
 </script>
 
 <template>
-  <div class="app">
-    <h1>抢占式开发工具</h1>
-    <div class="options">
-      <n-button type="primary" @click="optionHandle(OnOff.open)">
-        开启
-      </n-button>
-      <n-button type="error" @click="optionHandle(OnOff.close)">
-        关闭
-      </n-button>
-    </div>
-    <h2>当前状态</h2>
-    <n-progress
-      type="line"
-      :percentage="60"
-      :indicator-placement="'inside'"
-      processing
-    />
-  </div>
+  <Setup v-if="!config_storage" @save="saveHandle" />
+  <Options v-else />
 </template>
 
-<style scoped lang="scss">
-.app {
-  text-align: center;
-  .options {
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>
+<style scoped lang="scss"></style>

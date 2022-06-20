@@ -22,22 +22,27 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Config {
-        let configurable_map = Config::get_config();
-        Config { configurable_map }
+        // let configurable_map = Config::get_config();
+        Config {
+            configurable_map: HashMap::new(),
+        }
     }
 
     pub fn init(
+        &mut self,
         access_key_id: String,
         access_key_secret: String,
         release_time: String,
         password: String,
-    ) -> Config {
-        let mut configurable_map = HashMap::new();
-        configurable_map.insert(ConfigKey::access_key_id, access_key_id);
-        configurable_map.insert(ConfigKey::access_key_secret, access_key_secret);
-        configurable_map.insert(ConfigKey::release_time, release_time);
-        configurable_map.insert(ConfigKey::password, password);
-        Config { configurable_map }
+    ) {
+        self.configurable_map
+            .insert(ConfigKey::access_key_id, access_key_id);
+        self.configurable_map
+            .insert(ConfigKey::access_key_secret, access_key_secret);
+        self.configurable_map
+            .insert(ConfigKey::release_time, release_time);
+        self.configurable_map.insert(ConfigKey::password, password);
+        self.storage();
     }
 
     /// 更新配置信息

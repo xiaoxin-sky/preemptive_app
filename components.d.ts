@@ -5,9 +5,21 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AButton: typeof import('ant-design-vue/es')['Button']
+    AForm: typeof import('ant-design-vue/es')['Form']
+    AFormItem: typeof import('ant-design-vue/es')['FormItem']
+    AInput: typeof import('ant-design-vue/es')['Input']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
+    NCol: typeof import('naive-ui')['NCol']
+    NForm: typeof import('naive-ui')['NForm']
+    NFormItem: typeof import('naive-ui')['NFormItem']
+    NInput: typeof import('naive-ui')['NInput']
+    NMessageProvider: typeof import('naive-ui')['NMessageProvider']
     NProgress: typeof import('naive-ui')['NProgress']
+    NRow: typeof import('naive-ui')['NRow']
+    Options: typeof import('./src/components/Options.vue')['default']
+    Setup: typeof import('./src/components/Setup.vue')['default']
   }
 }
 

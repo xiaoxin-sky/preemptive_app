@@ -38,9 +38,9 @@ pub fn start_server() -> Result<(), Box<dyn Error>> {
 
 /// 开启 ss_local
 pub fn start_ssr_local() {
-    let config = Config::new();
-    let password = config.configurable_map.get(&ConfigKey::password);
-    let ip = config.configurable_map.get(&ConfigKey::ip);
+    let config = Config::get_config();
+    let password = config.get(&ConfigKey::password);
+    let ip = config.get(&ConfigKey::ip);
     if password.is_none() || ip.is_none() {
         panic!("出错");
     }
