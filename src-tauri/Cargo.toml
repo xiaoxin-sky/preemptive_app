@@ -15,9 +15,15 @@ rust-version = "1.57"
 tauri-build = { version = "1.0.0", features = [] }
 
 [dependencies]
-serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.0.0", features = ["api-all"] }
+shadowsocks-rust = "1.14.3"
+clap = "3.1.18"
+aliyun-openapi-core-rust-sdk = "0.3.0"
+serde_json = "1.0.81"
+chrono = "0.4.19"
+ssh2 = "0.9.3"
+ctrlc = "3.2.2"
 
 [features]
 # by default Tauri runs in production mode
@@ -26,3 +32,7 @@ default = [ "custom-protocol" ]
 # this feature is used used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = [ "tauri/custom-protocol" ]
+
+[[bin]]
+name="al_sslocal"
+path="./bin/al_sslocal.rs"
