@@ -1,4 +1,10 @@
-use std::{error::Error, process::Command, sync::mpsc::channel, thread, time::Instant};
+use std::{
+    error::Error,
+    process::{Child, Command},
+    sync::mpsc::{channel, Receiver},
+    thread,
+    time::Instant,
+};
 
 use crate::{
     manage::config::{Config, ConfigKey},
@@ -37,7 +43,7 @@ pub fn start_server() -> Result<(), Box<dyn Error>> {
 }
 
 /// 开启 ss_local
-pub fn start_ssr_local() {
+pub fn start_ssr_local(rx: &Receiver<&str>) {
     let config = Config::get_config();
     let password = config.get(&ConfigKey::password);
     let ip = config.get(&ConfigKey::ip);
@@ -59,28 +65,27 @@ pub fn start_ssr_local() {
         ])
         .spawn()
         .unwrap();
+    // let (tx_ssh, rx_ssh) = channel();
+    // let handle = thread::spawn(|| {
+    //     println!("child.id {}", child.id());
+    // });
+    // handle.join().unwrap();
+    let res = rx.recv().unwrap();
+    println!("关闭{}", res);
 
-    let (tx_ssh, rx_ssh) = channel();
-    let handle = thread::spawn(move || {
-        println!("child.id {}", child.id());
-        tx_ssh.send(child).expect("发送进程失败");
-    });
+    // let (tx, rx) = channel();
 
-    let (tx, rx) = channel();
+    // ctrlc::set_handler(move || {
+    //     let mut child = rx_ssh.recv().unwrap();
+    //     println!("杀死进程{}", child.id());
+    //     child.kill().expect("❌进程杀死失败");
+    //     tx.send(()).expect("Could not send signal on channel.");
+    // })
+    // .expect("Error setting Ctrl-C handler");
 
-    ctrlc::set_handler(move || {
-        let mut child = rx_ssh.recv().unwrap();
-        println!("杀死进程{}", child.id());
-        child.kill().expect("❌进程杀死失败");
-        tx.send(()).expect("Could not send signal on channel.");
-    })
-    .expect("Error setting Ctrl-C handler");
-
-    println!(" Ctrl-C 退出程序");
-    rx.recv().expect("Could not receive from channel.");
-    println!("退出成功");
-
-    handle.join().unwrap();
+    // println!(" Ctrl-C 退出程序");
+    // rx.recv().expect("Could not receive from channel.");
+    // println!("退出成功");
 }
 
 // 关闭 ss
