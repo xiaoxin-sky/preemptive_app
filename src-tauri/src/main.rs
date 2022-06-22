@@ -5,6 +5,7 @@
 
 use std::sync::Mutex;
 
+use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
 use tauri::{generate_context, Manager};
 
@@ -59,6 +60,10 @@ fn main() {
                     }
                     _ => print!("类型不正确"),
                 }
+            });
+
+            app.listen_global("createInstance", |_| {
+                start_server();
             });
 
             Ok(())

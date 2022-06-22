@@ -10,6 +10,9 @@ enum OnOff {
 const optionHandle = (type: OnOff) => {
   appWindow.emit("onOff", type);
 };
+const createHandle = () => {
+  appWindow.emit("createInstance");
+};
 
 onMounted(() => {
   appWindow.listen("setup_ok", (v) => {
@@ -21,6 +24,7 @@ onMounted(() => {
 <template>
   <div class="app">
     <div class="options">
+      <a-button type="primary" @click="createHandle">创建</a-button>
       <a-button type="primary" @click="optionHandle(OnOff.open)">开启</a-button>
       <a-button type="error" @click="optionHandle(OnOff.close)">关闭</a-button>
     </div>
