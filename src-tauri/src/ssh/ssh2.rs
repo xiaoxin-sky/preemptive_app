@@ -8,6 +8,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
 
+use crate::manage::config::{Config, ConfigKey};
 use crate::rpc::client::ClientCore;
 use crate::rpc::instance::{check_instance_run, reboot_instance};
 fn connect_ssh(ip_address: &str) -> Session {
@@ -17,11 +18,17 @@ fn connect_ssh(ip_address: &str) -> Session {
         sleep(Duration::new(3, 0));
         tcp = TcpStream::connect(String::from(ip_address) + ":22");
     }
-    println!("🀄️ssh链接成功");
+    println!(
+        "🀄ssh链接...{}",
+        &Config::get_config_by_key(ConfigKey::password)
+    );
+
     let mut sess = Session::new().unwrap();
     sess.set_tcp_stream(tcp.unwrap());
     sess.handshake().unwrap();
-    sess.userauth_password("root", "EcsV587!").unwrap();
+    println!("🀄️ssh链接成功");
+    sess.userauth_password("root", &Config::get_config_by_key(ConfigKey::password))
+        .unwrap();
     sess
 }
 

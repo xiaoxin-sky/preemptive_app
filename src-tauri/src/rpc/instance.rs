@@ -2,6 +2,8 @@ use std::{error::Error, thread::sleep, time::Duration};
 
 use serde::{Deserialize, Serialize};
 
+use crate::manage::config::{Config, ConfigKey};
+
 use super::client::ClientCore;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -90,6 +92,7 @@ pub fn create_instance(
     vswitch_id: &str,
 ) -> Result<InstanceIdSets, Box<dyn Error>> {
     println!("开始创建实例");
+    let config = Config::get_config();
     // 创建实例
     let res: RunInstancesResponse = client.request(
         "RunInstances",
@@ -105,8 +108,15 @@ pub fn create_instance(
             ("SecurityGroupId", security_group_id),
             ("VSwitchId", vswitch_id),
             ("InstanceName", "alispotCreatedInstance"),
-            ("Password", "EcsV587!"),
+            (
+                "Password",
+                Config::get_config_by_key(ConfigKey::password).as_str(),
+            ),
             ("InternetMaxBandwidthOut", "10"),
+            (
+                "AutoReleaseTime",
+                Config::get_config_by_key(ConfigKey::release_time).as_str(),
+            ),
         ],
     )?;
 

@@ -51,12 +51,16 @@ export interface IConfig {
   password: string;
 }
 
-const modelRef = ref<IConfig>({
-  access_key_id: "",
-  access_key_secret: "",
-  release_time: "",
-  password: "",
-});
+const modelRef = ref<IConfig>(
+  localStorage.getItem("config") !== null
+    ? JSON.parse(localStorage.getItem("config")!)
+    : {
+        access_key_id: "",
+        access_key_secret: "",
+        release_time: "",
+        password: "",
+      }
+);
 
 const emit = defineEmits<{ (e: "save", val: IConfig): void }>();
 

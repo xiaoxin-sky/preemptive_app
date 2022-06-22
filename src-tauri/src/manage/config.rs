@@ -22,9 +22,9 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Config {
-        // let configurable_map = Config::get_config();
+        let configurable_map = Config::get_config();
         Config {
-            configurable_map: HashMap::new(),
+            configurable_map: configurable_map,
         }
     }
 
@@ -55,6 +55,8 @@ impl Config {
         let base_dir = "./.ss_config";
         let config_file_path = "./.ss_config/config.json";
 
+        fs::remove_file(config_file_path);
+
         fs::create_dir_all(base_dir).expect("创建 ss_config 目录");
 
         let mut file = match OpenOptions::new()
@@ -74,13 +76,21 @@ impl Config {
     pub fn get_config() -> HashMap<ConfigKey, String> {
         let config_file_path = "./.ss_config/config.json";
 
-        let mut config = String::new();
-        File::open(config_file_path)
-            .unwrap()
-            .read_to_string(&mut config)
-            .expect("读取失败");
-        let res: HashMap<ConfigKey, String> = serde_json::from_str(config.as_str()).unwrap();
-        println!("{:?}", res.get(&ConfigKey::access_key_id));
-        res
+        match File::open(config_file_path) {
+            Ok(mut file) => {
+                let mut config = String::new();
+                file.read_to_string(&mut config).expect("读取失败");
+                let res: HashMap<ConfigKey, String> =
+                    serde_json::from_str(config.as_str()).unwrap();
+                println!("{:?}", res.get(&ConfigKey::access_key_id));
+                res
+            }
+            Err(_) => HashMap::new(),
+        }
+    }
+
+    pub fn get_config_by_key(config_key: ConfigKey) -> String {
+        let config = Config::get_config();
+        config.get(&config_key).unwrap().clone()
     }
 }

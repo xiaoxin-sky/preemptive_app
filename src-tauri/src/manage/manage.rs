@@ -14,12 +14,12 @@ use crate::{
 use ssh::ssh2::install_ssr;
 
 /// 启动实例并连接 ss
-pub fn start_server() -> Result<(), Box<dyn Error>> {
+pub fn start_server() -> Result<String, Box<dyn Error>> {
     let now = Instant::now();
     let region_id = "ap-southeast-1";
     let client = ClientCore::new(
-        String::from("LTAI5tBtNCk4QCbgdGM8ckaw"),
-        String::from("9hjsBdKzKU4JS7OaqrNJqr6LFRWrsw"),
+        Config::get_config_by_key(ConfigKey::access_key_id),
+        Config::get_config_by_key(ConfigKey::access_key_secret),
     );
     let spot_obj = spot_price::get_low_price_spot(&client)?.expect("没有找到 spot ");
     println!("spot 信息{:#?}", spot_obj);
@@ -39,15 +39,16 @@ pub fn start_server() -> Result<(), Box<dyn Error>> {
 
     let elapsed_time = now.elapsed();
     println!("启动服务用时 {} 秒", elapsed_time.as_secs());
-    Ok(())
+    let mut config = Config::new();
+    config.update(ConfigKey::ip, ip_address.clone());
+    Ok(ip_address)
 }
 
 /// 开启 ss_local
 pub fn start_ssr_local() -> Child {
     let config = Config::get_config();
-    let password = config.get(&ConfigKey::password);
     let ip = config.get(&ConfigKey::ip);
-    if password.is_none() || ip.is_none() {
+    if ip.is_none() {
         panic!("出错");
     }
 
@@ -59,7 +60,7 @@ pub fn start_ssr_local() -> Child {
             "-s",
             format!("{}:33330", ip.unwrap()).as_str(),
             "-k",
-            password.unwrap().as_str(),
+            "xiaoze123",
             "-m",
             "aes-256-gcm",
         ])

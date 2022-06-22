@@ -42,7 +42,7 @@ fn main() {
                     payLoad.access_key_secret,
                     payLoad.release_time,
                     payLoad.password,
-                )
+                );
             });
 
             let child = Mutex::new(None);
