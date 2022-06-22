@@ -9,6 +9,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^6.1.0",
     "@tauri-apps/api": "^1.0.1",
     "ant-design-vue": "^3.2.7",
     "vue": "^3.2.25"

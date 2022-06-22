@@ -3,6 +3,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import { ref } from "vue";
 import Options from "./components/Options.vue";
 import { IConfig } from "./components/Setup.vue";
+import Drawer from "./components/Drawer.vue";
 interface Config {
   access_key_id: string;
   access_key_secret: string;
@@ -21,8 +22,15 @@ const saveHandle = (val: IConfig) => {
 </script>
 
 <template>
-  <Setup v-if="!config_storage" @save="saveHandle" />
-  <Options v-else />
+  <div class="app">
+    <Drawer @save="saveHandle" />
+    <Setup v-if="!config_storage" @save="saveHandle" />
+    <Options v-else />
+  </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.app {
+  padding: 12px 16px;
+}
+</style>
