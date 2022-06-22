@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
+use std::{process::Child, sync::Mutex, thread::sleep, time::Duration};
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
@@ -27,6 +27,34 @@ struct SaveConfigPalLoad {
     password: String,
 }
 
+struct MyState {
+    child: Mutex<Option<Child>>,
+}
+
+#[tauri::command]
+fn open_ss(state: tauri::State<MyState>) -> bool {
+    *state.child.lock().unwrap() = Some(start_ssr_local());
+    return true;
+}
+
+#[tauri::command]
+fn close_ss(state: tauri::State<MyState>) -> bool {
+    match state.child.lock().unwrap().as_mut() {
+        Some(child) => match child.kill() {
+            Ok(_) => true,
+            Err(_) => false,
+        },
+        None => false,
+    }
+}
+#[tauri::command]
+fn create_instance() -> bool {
+    match start_server() {
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+
 fn main() {
     let context = generate_context!();
 
@@ -45,29 +73,12 @@ fn main() {
                 );
             });
 
-            let child = Mutex::new(None);
-            let id = app.listen_global("onOff", move |event| {
-                let payLoad = event.payload().unwrap();
-
-                match payLoad {
-                    "open" => {
-                        let mut v = child.lock().unwrap();
-                        *v = Some(start_ssr_local());
-                    }
-                    "close" => {
-                        let mut a = child.lock().unwrap();
-                        a.as_mut().unwrap().kill().expect("杀死进程失败");
-                    }
-                    _ => print!("类型不正确"),
-                }
-            });
-
-            app.listen_global("createInstance", |_| {
-                start_server();
-            });
-
             Ok(())
         })
+        .manage(MyState {
+            child: Mutex::new(None),
+        })
+        .invoke_handler(tauri::generate_handler![open_ss, close_ss, create_instance])
         .menu(tauri::Menu::os_default(&context.package_info().name))
         .run(context)
         .expect("error while running tauri application");

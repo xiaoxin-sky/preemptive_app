@@ -82,7 +82,6 @@ impl Config {
                 file.read_to_string(&mut config).expect("读取失败");
                 let res: HashMap<ConfigKey, String> =
                     serde_json::from_str(config.as_str()).unwrap();
-                println!("{:?}", res.get(&ConfigKey::access_key_id));
                 res
             }
             Err(_) => HashMap::new(),
