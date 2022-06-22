@@ -3,10 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::{
-    process::Child,
-    sync::mpsc::{channel, Receiver},
-};
+use std::sync::Mutex;
 
 use serde::{Deserialize, Serialize};
 use tauri::{generate_context, Manager};
@@ -46,26 +43,19 @@ fn main() {
                     payLoad.password,
                 )
             });
-            let (tx, rx) = channel();
 
+            let child = Mutex::new(None);
             let id = app.listen_global("onOff", move |event| {
-                println!("收到事件{:?}", event);
                 let payLoad = event.payload().unwrap();
 
                 match payLoad {
                     "open" => {
-                        start_ssr_local(&rx);
+                        let mut v = child.lock().unwrap();
+                        *v = Some(start_ssr_local());
                     }
                     "close" => {
-                        tx.send("close");
-                        // let mut a = child.unwrap();
-                        // a.kill();
-                        // println!("---{:?}",&child);
-                        // if child.is_some() {
-                        // let mut child = rx.unwrap().recv().unwrap();
-                        // println!("杀死进程{}", &child.as_ref().unwrap().id());
-                        // &child.unwrap().kill().expect("❌进程杀死失败");
-                        // }
+                        let mut a = child.lock().unwrap();
+                        a.as_mut().unwrap().kill().expect("杀死进程失败");
                     }
                     _ => print!("类型不正确"),
                 }

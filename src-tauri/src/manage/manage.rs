@@ -43,7 +43,7 @@ pub fn start_server() -> Result<(), Box<dyn Error>> {
 }
 
 /// 开启 ss_local
-pub fn start_ssr_local(rx: &Receiver<&str>) {
+pub fn start_ssr_local() -> Child {
     let config = Config::get_config();
     let password = config.get(&ConfigKey::password);
     let ip = config.get(&ConfigKey::ip);
@@ -65,13 +65,14 @@ pub fn start_ssr_local(rx: &Receiver<&str>) {
         ])
         .spawn()
         .unwrap();
+    child
     // let (tx_ssh, rx_ssh) = channel();
-    // let handle = thread::spawn(|| {
+    // let handle = thread::spawn(move || {
     //     println!("child.id {}", child.id());
+    // let res = rx.try_recv().unwrap();
+    // println!("关闭{}", res);
     // });
     // handle.join().unwrap();
-    let res = rx.recv().unwrap();
-    println!("关闭{}", res);
 
     // let (tx, rx) = channel();
 
