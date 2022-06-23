@@ -7,6 +7,7 @@ use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
+use tauri::{App, AppHandle};
 
 use crate::manage::config::{Config, ConfigKey};
 use crate::rpc::client::ClientCore;
@@ -32,7 +33,13 @@ fn connect_ssh(ip_address: &str) -> Session {
     sess
 }
 
-pub fn install_ssr(client: &ClientCore, ip_address: &str, region_id: &str, instance_id: &str) {
+pub fn install_ssr(
+    client: &ClientCore,
+    ip_address: &str,
+    region_id: &str,
+    instance_id: &str,
+    app: AppHandle,
+) {
     // sleep(Duration::new(5, 0));
     // println!("🚀 延迟5秒");
     // check_instance_run(client, region_id, instance_id).expect("❌服务器查询失败");
@@ -48,7 +55,7 @@ pub fn install_ssr(client: &ClientCore, ip_address: &str, region_id: &str, insta
     // sleep(Duration::new(5, 0));
     check_instance_run(client, region_id, instance_id).expect("❌服务器查询失败");
 
-    install_shadowsock(&session);
+    install_shadowsock(&session, app);
 }
 
 /// 上传 BBR 并重启开启 BBR服务
@@ -81,11 +88,16 @@ fn upload_bbr(session: &Session) {
 }
 
 /// 安装启动 ssr 服务
-fn install_shadowsock(session: &Session) {
-    let local_path = "install_shadowsocks.sh";
+fn install_shadowsock(session: &Session, app: tauri::AppHandle) {
+    let local_path = app
+        .path_resolver()
+        .resolve_resource("install_shadowsocks.sh")
+        .unwrap()
+        .to_string_lossy()
+        .to_string();
     let server_path = "/root/install_shadowsocks.sh";
 
-    upload_file(session, local_path, server_path);
+    upload_file(session, local_path.as_str(), server_path);
 
     let sess = session;
     let mut channel = sess.channel_session().unwrap();

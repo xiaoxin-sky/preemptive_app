@@ -79,13 +79,14 @@ impl Config {
 
         match File::open(config_file_path) {
             Ok(mut file) => {
+                println!("文件地址{:?}", file);
                 let mut config = String::new();
                 file.read_to_string(&mut config).expect("读取失败");
                 let res: HashMap<ConfigKey, String> =
                     serde_json::from_str(config.as_str()).unwrap();
                 res
             }
-            Err(_) => HashMap::new(),
+            Err(err) => HashMap::new(),
         }
     }
 

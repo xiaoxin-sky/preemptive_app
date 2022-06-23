@@ -14,7 +14,7 @@ use crate::{
 use ssh::ssh2::install_ssr;
 
 /// 启动实例并连接 ss
-pub fn start_server() -> Result<String, Box<dyn Error>> {
+pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
     let now = Instant::now();
     let region_id = "ap-southeast-1";
     let client = ClientCore::new(
@@ -35,7 +35,7 @@ pub fn start_server() -> Result<String, Box<dyn Error>> {
         spot_obj.ZoneId,
     )?;
     println!("实例 id->{} ip_address->{}", instance_id, ip_address);
-    install_ssr(&client, ip_address.as_str(), region_id, &instance_id);
+    install_ssr(&client, ip_address.as_str(), region_id, &instance_id, app);
 
     let elapsed_time = now.elapsed();
     println!("启动服务用时 {} 秒", elapsed_time.as_secs());
@@ -53,7 +53,7 @@ pub fn start_ssr_local() -> Child {
     }
 
     // println!("命令{}", server_arg);
-    let child = Command::new("al_sslocal")
+    let child = Command::new("sslocal")
         .args([
             "-b",
             "127.0.0.1:1081",

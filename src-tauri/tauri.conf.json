@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "",
     "beforeDevCommand": "pnpm dev",
     "devPath": "http://localhost:33331",
     "distDir": "../dist"
@@ -12,7 +12,14 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "shell": {
+        "all": true,
+        "execute": true,
+        "open": false,
+        "scope": [{ "name": "/absolute/path/to/app", "sidecar": true }],
+        "sidecar": false
+      }
     },
     "bundle": {
       "active": true,
@@ -21,7 +28,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": [],
+      "externalBin": ["bin/sslocal"],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -29,7 +36,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.preemptive.app",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -38,7 +45,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": ["install_shadowsocks.sh", "bbr.sh"],
       "shortDescription": "",
       "targets": "all",
       "windows": {

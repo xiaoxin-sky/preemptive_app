@@ -7,7 +7,7 @@ use std::{process::Child, sync::Mutex};
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
-use tauri::{generate_context, Manager};
+use tauri::{api::path, generate_context, Manager};
 
 use crate::manage::{config::Config, manage::start_ssr_local};
 #[derive(Clone, serde::Serialize)]
@@ -48,8 +48,8 @@ fn close_ss(state: tauri::State<MyState>) -> bool {
     }
 }
 #[tauri::command]
-fn create_instance() -> bool {
-    match start_server() {
+fn create_instance(app: tauri::AppHandle) -> bool {
+    match start_server(app) {
         Ok(_) => true,
         Err(_) => false,
     }
