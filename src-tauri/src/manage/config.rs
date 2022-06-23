@@ -4,6 +4,7 @@ use std::{
     io::{Read, Write},
 };
 
+use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
 
 /// 可配置的内容
@@ -90,6 +91,19 @@ impl Config {
 
     pub fn get_config_by_key(config_key: ConfigKey) -> String {
         let config = Config::get_config();
-        config.get(&config_key).unwrap().clone()
+        let res = config.get(&config_key).unwrap().clone();
+        if config_key.eq(&ConfigKey::release_time) {
+            let now = Utc::now();
+            // let house = ;
+            let future_time = match res.parse::<i64>() {
+                Ok(hours) => now.checked_add_signed(Duration::hours(hours)),
+                Err(_) => now.checked_add_signed(Duration::hours(9)),
+            };
+
+            let a = future_time.unwrap().format("%FT%TZ");
+            a.to_string()
+        } else {
+            res
+        }
     }
 }

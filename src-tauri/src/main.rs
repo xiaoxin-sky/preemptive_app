@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::{process::Child, sync::Mutex, thread::sleep, time::Duration};
+use std::{process::Child, sync::Mutex};
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
