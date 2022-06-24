@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { appWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/tauri";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { message } from "ant-design-vue";
 enum OnOff {
   open = "open",
@@ -9,13 +9,21 @@ enum OnOff {
 }
 
 const optionHandle = async (type: OnOff) => {
-  let res: boolean;
+  let res: string;
   switch (type) {
     case OnOff.open:
       res = await invoke("open_ss");
+      if (res) {
+        state.state = InstanceState.Running;
+        state.msg = res;
+      }
       break;
     case OnOff.close:
       res = await invoke("close_ss");
+      if (res) {
+        state.state = InstanceState.Running;
+        state.msg = "已关闭";
+      }
       break;
   }
   console.log("jiegu", res);
@@ -26,9 +34,22 @@ const optionHandle = async (type: OnOff) => {
     message.error("操作失败");
   }
 };
-
+enum InstanceState {
+  None,
+  Creating,
+  Running,
+  Closed,
+}
 const percent = ref(0);
+
+const state = reactive<{ state: InstanceState; msg: string }>({
+  state: InstanceState.None,
+  msg: "暂无实例",
+});
+
 const createHandle = async () => {
+  state.state = InstanceState.Creating;
+  state.msg = "创建中...";
   let count = 1;
   const up = () => {
     if (count < 36) {
@@ -38,9 +59,11 @@ const createHandle = async () => {
     }
   };
   up();
-  const res = await invoke("create_instance");
+  const ip: string = await invoke("create_instance");
   percent.value = 100;
-  console.log("shili结果", res);
+  localStorage.setItem("instance_info", JSON.stringify({ ip }));
+  state.state = InstanceState.Closed;
+  state.msg = ip;
 };
 
 onMounted(() => {
@@ -62,7 +85,13 @@ onMounted(() => {
       <a-button type="error" @click="optionHandle(OnOff.close)">关闭</a-button>
     </div>
     <h2>当前状态</h2>
-    <a-progress type="circle" :percent="percent" :width="80" />
+    <p>{{ state.msg }}</p>
+    <a-progress
+      type="circle"
+      v-if="state.state === InstanceState.Creating"
+      :percent="percent"
+      :width="80"
+    />
   </div>
 </template>
 

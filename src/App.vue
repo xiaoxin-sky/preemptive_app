@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { appWindow } from "@tauri-apps/api/window";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Options from "./components/Options.vue";
 import { IConfig } from "./components/Setup.vue";
 import Drawer from "./components/Drawer.vue";
+import { listen } from "@tauri-apps/api/event";
 interface Config {
   access_key_id: string;
   access_key_secret: string;
@@ -19,6 +20,12 @@ const saveHandle = (val: IConfig) => {
   config_storage.value = newVal;
   appWindow.emit("saveConfig", val);
 };
+const val = ref();
+onMounted(() => {
+  listen("message", (e) => {
+    val.value = JSON.stringify(e);
+  });
+});
 </script>
 
 <template>
@@ -26,6 +33,7 @@ const saveHandle = (val: IConfig) => {
     <Drawer @save="saveHandle" />
     <Setup v-if="!config_storage" @save="saveHandle" />
     <Options v-else />
+    <div>{{ val }}</div>
   </div>
 </template>
 

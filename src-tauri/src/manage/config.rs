@@ -86,7 +86,7 @@ impl Config {
                     serde_json::from_str(config.as_str()).unwrap();
                 res
             }
-            Err(err) => HashMap::new(),
+            Err(_) => HashMap::new(),
         }
     }
 

@@ -3,11 +3,14 @@
     windows_subsystem = "windows"
 )]
 
-use std::{process::Child, sync::Mutex};
+use std::sync::Mutex;
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
-use tauri::{api::path, generate_context, Manager};
+use tauri::{
+    api::{path, process::CommandChild},
+    generate_context, Manager,
+};
 
 use crate::manage::{config::Config, manage::start_ssr_local};
 #[derive(Clone, serde::Serialize)]
@@ -28,30 +31,33 @@ struct SaveConfigPalLoad {
 }
 
 struct MyState {
-    child: Mutex<Option<Child>>,
+    child: Mutex<Option<CommandChild>>,
 }
 
 #[tauri::command]
-fn open_ss(state: tauri::State<MyState>) -> bool {
-    *state.child.lock().unwrap() = Some(start_ssr_local());
-    return true;
+fn open_ss(state: tauri::State<MyState>, app: tauri::AppHandle) -> String {
+    *state.child.lock().unwrap() = start_ssr_local(app);
+    return "ok".to_string();
 }
 
 #[tauri::command]
 fn close_ss(state: tauri::State<MyState>) -> bool {
-    match state.child.lock().unwrap().as_mut() {
-        Some(child) => match child.kill() {
-            Ok(_) => true,
-            Err(_) => false,
-        },
-        None => false,
-    }
+    true
+    // let a = state.child.lock().unwrap();
+    // a.unwrap().as_ref().kill();
+    // match state.child.lock().unwrap().as_mut() {
+    //     Some(child) => match child.kill() {
+    //         Ok(_) => true,
+    //         Err(_) => false,
+    //     },
+    //     None => false,
+    // }
 }
 #[tauri::command]
-fn create_instance(app: tauri::AppHandle) -> bool {
+fn create_instance(app: tauri::AppHandle) -> String {
     match start_server(app) {
-        Ok(_) => true,
-        Err(_) => false,
+        Ok(ip) => ip,
+        Err(_) => "".to_string(),
     }
 }
 

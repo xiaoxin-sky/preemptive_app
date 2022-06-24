@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "",
+    "beforeBuildCommand": "pnpm build",
     "beforeDevCommand": "pnpm dev",
     "devPath": "http://localhost:33331",
     "distDir": "../dist"
@@ -12,13 +12,20 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
       "shell": {
+        "scope": [{ "name": "bin/sslocal", "sidecar": true }]
+      },
+      "path": {
+        "all": true
+      },
+      "process": {
         "all": true,
-        "execute": true,
-        "open": false,
-        "scope": [{ "name": "/absolute/path/to/app", "sidecar": true }],
-        "sidecar": false
+        "exit": true,
+        "relaunch": true,
+        "relaunchDangerousAllowSymlinkMacos": false
+      },
+      "fs": {
+        "all": true
       }
     },
     "bundle": {

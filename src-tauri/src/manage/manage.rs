@@ -1,10 +1,4 @@
-use std::{
-    error::Error,
-    process::{Child, Command},
-    sync::mpsc::{channel, Receiver},
-    thread,
-    time::Instant,
-};
+use std::{error::Error, time::Instant};
 
 use crate::{
     manage::config::{Config, ConfigKey},
@@ -12,8 +6,12 @@ use crate::{
     ssh,
 };
 use ssh::ssh2::install_ssr;
+use tauri::{
+    api::process::{Command, CommandChild, CommandEvent},
+    window, Manager,
+};
 
-/// 启动实例并连接 ss
+/// 创建新实例
 pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
     let now = Instant::now();
     let region_id = "ap-southeast-1";
@@ -45,15 +43,14 @@ pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
 }
 
 /// 开启 ss_local
-pub fn start_ssr_local() -> Child {
+pub fn start_ssr_local(app: tauri::AppHandle) -> Option<CommandChild> {
     let config = Config::get_config();
     let ip = config.get(&ConfigKey::ip);
     if ip.is_none() {
-        panic!("出错");
+        return None;
     }
 
-    // println!("命令{}", server_arg);
-    let child = Command::new("sslocal")
+    let (mut rx, child) = Command::new("sslocal")
         .args([
             "-b",
             "127.0.0.1:1081",
@@ -65,29 +62,8 @@ pub fn start_ssr_local() -> Child {
             "aes-256-gcm",
         ])
         .spawn()
-        .unwrap();
-    child
-    // let (tx_ssh, rx_ssh) = channel();
-    // let handle = thread::spawn(move || {
-    //     println!("child.id {}", child.id());
-    // let res = rx.try_recv().unwrap();
-    // println!("关闭{}", res);
-    // });
-    // handle.join().unwrap();
-
-    // let (tx, rx) = channel();
-
-    // ctrlc::set_handler(move || {
-    //     let mut child = rx_ssh.recv().unwrap();
-    //     println!("杀死进程{}", child.id());
-    //     child.kill().expect("❌进程杀死失败");
-    //     tx.send(()).expect("Could not send signal on channel.");
-    // })
-    // .expect("Error setting Ctrl-C handler");
-
-    // println!(" Ctrl-C 退出程序");
-    // rx.recv().expect("Could not receive from channel.");
-    // println!("退出成功");
+        .expect("启动 sslocal 失败");
+    Some(child)
 }
 
 // 关闭 ss
