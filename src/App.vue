@@ -20,10 +20,14 @@ const saveHandle = (val: IConfig) => {
   config_storage.value = newVal;
   appWindow.emit("saveConfig", val);
 };
-const val = ref();
+const val = ref<string[]>([]);
+// console.log(window.__TAURI__.event);
+
 onMounted(() => {
-  listen("message", (e) => {
-    val.value = JSON.stringify(e);
+  listen("sslocal_message", (event) => {
+    console.log("收到消息L：", event);
+
+    val.value.push(JSON.stringify(event));
   });
 });
 </script>

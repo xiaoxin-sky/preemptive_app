@@ -2,13 +2,18 @@ use std::{
     collections::HashMap,
     fs::{self, File, OpenOptions},
     io::{Read, Write},
+    path::PathBuf,
 };
 
 use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
+use tauri::{
+    api::path::{resolve_path, BaseDirectory},
+    Manager,
+};
 
 /// 可配置的内容
-#[derive(Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Hash, Serialize, Deserialize, Debug)]
 pub enum ConfigKey {
     access_key_id,
     access_key_secret,
@@ -19,13 +24,24 @@ pub enum ConfigKey {
 
 pub struct Config {
     pub configurable_map: HashMap<ConfigKey, String>,
+    pub config_path: PathBuf,
 }
 
 impl Config {
-    pub fn new() -> Config {
-        let configurable_map = Config::get_config();
+    pub fn new(app: tauri::AppHandle) -> Config {
+        let config_path = resolve_path(
+            &app.config(),
+            app.package_info(),
+            &app.env(),
+            ".ss_config/config.json",
+            Some(BaseDirectory::App),
+        )
+        .expect("配置文件路径获取失败");
+        let configurable_map = Config::get_config(config_path);
+
         Config {
-            configurable_map: configurable_map,
+            configurable_map,
+            config_path,
         }
     }
 
@@ -53,12 +69,8 @@ impl Config {
     }
 
     fn storage(&self) {
-        let base_dir = "./.ss_config";
-        let config_file_path = "./.ss_config/config.json";
-
-        fs::remove_file(config_file_path);
-
-        fs::create_dir_all(base_dir).expect("创建 ss_config 目录");
+        let config_file_path = self.config_path;
+        fs::remove_file(self.config_path);
 
         let mut file = match OpenOptions::new()
             .read(true)
@@ -74,10 +86,8 @@ impl Config {
         file.write(config.as_bytes()).expect("写入失败");
     }
 
-    pub fn get_config() -> HashMap<ConfigKey, String> {
-        let config_file_path = "./.ss_config/config.json";
-
-        match File::open(config_file_path) {
+    fn get_config(config_path: PathBuf) -> HashMap<ConfigKey, String> {
+        match File::open(config_path) {
             Ok(mut file) => {
                 println!("文件地址{:?}", file);
                 let mut config = String::new();
@@ -86,13 +96,15 @@ impl Config {
                     serde_json::from_str(config.as_str()).unwrap();
                 res
             }
-            Err(_) => HashMap::new(),
+            Err(err) => {
+                println!("打开config.json失败{:?}", err);
+                HashMap::new()
+            }
         }
     }
 
-    pub fn get_config_by_key(config_key: ConfigKey) -> String {
-        let config = Config::get_config();
-        let res = config.get(&config_key).unwrap().clone();
+    pub fn get_config_by_key(&self, config_key: ConfigKey) -> String {
+        let res = self.configurable_map.get(&config_key).unwrap().clone();
         if config_key.eq(&ConfigKey::release_time) {
             let now = Utc::now();
             // let house = ;

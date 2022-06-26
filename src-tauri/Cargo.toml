@@ -2,21 +2,19 @@
 name = "preemptive_app"
 version = "0.1.0"
 description = "A Tauri App"
-authors = ["you"]
 license = ""
 repository = ""
-default-run = "preemptive_app"
 edition = "2021"
 rust-version = "1.57"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.0.0", features = [] }
+tauri-build = { version = "1.0.0", features = ["codegen"] }
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.0", features = ["fs-all", "path-all", "process-all", "process-command-api"] }
+tauri = { version = "1.0.0", features = ["process-command-api", "shell-sidecar"] }
 shadowsocks-rust = { version = "1.14.3", optional = true }
 clap = "3.1.18"
 aliyun-openapi-core-rust-sdk = "0.3.0"

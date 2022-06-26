@@ -36,7 +36,7 @@ struct MyState {
 
 #[tauri::command]
 fn open_ss(state: tauri::State<MyState>, app: tauri::AppHandle) -> String {
-    *state.child.lock().unwrap() = start_ssr_local(app);
+    start_ssr_local(app);
     return "ok".to_string();
 }
 
@@ -66,18 +66,18 @@ fn main() {
 
     tauri::Builder::default()
         .setup(|app| {
-            let id = app.listen_global("saveConfig", |event| {
-                let payLoad: SaveConfigPalLoad =
-                    serde_json::from_str(event.payload().unwrap()).unwrap();
-                println!("收到事件 {:?}", payLoad);
-                let mut config = Config::new();
-                config.init(
-                    payLoad.access_key_id,
-                    payLoad.access_key_secret,
-                    payLoad.release_time,
-                    payLoad.password,
-                );
-            });
+            // let id = app.listen_global("saveConfig", move |event| {
+            //     let payLoad: SaveConfigPalLoad =
+            //         serde_json::from_str(event.payload().unwrap()).unwrap();
+            //     println!("收到事件 {:?}", payLoad);
+            //     let mut config = Config::new(app.app_handle());
+            //     config.init(
+            //         payLoad.access_key_id,
+            //         payLoad.access_key_secret,
+            //         payLoad.release_time,
+            //         payLoad.password,
+            //     );
+            // });
 
             Ok(())
         })

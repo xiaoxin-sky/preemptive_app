@@ -90,9 +90,9 @@ pub fn create_instance(
     zone_id: &str,
     security_group_id: &str,
     vswitch_id: &str,
+    config: &Config,
 ) -> Result<InstanceIdSets, Box<dyn Error>> {
     println!("开始创建实例");
-    let config = Config::get_config();
     // 创建实例
     let res: RunInstancesResponse = client.request(
         "RunInstances",
@@ -110,12 +110,12 @@ pub fn create_instance(
             ("InstanceName", "alispotCreatedInstance"),
             (
                 "Password",
-                Config::get_config_by_key(ConfigKey::password).as_str(),
+                config.get_config_by_key(ConfigKey::password).as_str(),
             ),
             ("InternetMaxBandwidthOut", "10"),
             (
                 "AutoReleaseTime",
-                Config::get_config_by_key(ConfigKey::release_time).as_str(),
+                config.get_config_by_key(ConfigKey::release_time).as_str(),
             ),
         ],
     )?;

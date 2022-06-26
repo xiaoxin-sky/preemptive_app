@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "",
     "beforeDevCommand": "pnpm dev",
     "devPath": "http://localhost:33331",
     "distDir": "../dist"
@@ -12,20 +12,10 @@
   },
   "tauri": {
     "allowlist": {
+      "all": false,
       "shell": {
-        "scope": [{ "name": "bin/sslocal", "sidecar": true }]
-      },
-      "path": {
-        "all": true
-      },
-      "process": {
-        "all": true,
-        "exit": true,
-        "relaunch": true,
-        "relaunchDangerousAllowSymlinkMacos": false
-      },
-      "fs": {
-        "all": true
+        "sidecar": true,
+        "scope": [{ "name": "binaries/sslocal", "sidecar": true }]
       }
     },
     "bundle": {
@@ -35,7 +25,7 @@
       "deb": {
         "depends": []
       },
-      "externalBin": ["bin/sslocal"],
+      "externalBin": ["binaries/sslocal"],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -46,11 +36,8 @@
       "identifier": "com.preemptive.app",
       "longDescription": "",
       "macOS": {
-        "entitlements": null,
         "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
+        "frameworks": []
       },
       "resources": ["install_shadowsocks.sh", "bbr.sh"],
       "shortDescription": "",
@@ -62,7 +49,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'"
     },
     "updater": {
       "active": false

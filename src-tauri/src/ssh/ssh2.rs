@@ -12,23 +12,21 @@ use tauri::{App, AppHandle};
 use crate::manage::config::{Config, ConfigKey};
 use crate::rpc::client::ClientCore;
 use crate::rpc::instance::{check_instance_run, reboot_instance};
-fn connect_ssh(ip_address: &str) -> Session {
+fn connect_ssh(ip_address: &str, app: AppHandle) -> Session {
+    let config = Config::new(app);
     let mut tcp = TcpStream::connect(String::from(ip_address) + ":22");
     while tcp.is_err() {
         println!("❌连接ssh失败，三秒后重试");
         sleep(Duration::new(3, 0));
         tcp = TcpStream::connect(String::from(ip_address) + ":22");
     }
-    println!(
-        "🀄ssh链接...{}",
-        &Config::get_config_by_key(ConfigKey::password)
-    );
+    println!("🀄ssh链接...");
 
     let mut sess = Session::new().unwrap();
     sess.set_tcp_stream(tcp.unwrap());
     sess.handshake().unwrap();
     println!("🀄️ssh链接成功");
-    sess.userauth_password("root", &Config::get_config_by_key(ConfigKey::password))
+    sess.userauth_password("root", &config.get_config_by_key(ConfigKey::password))
         .unwrap();
     sess
 }
@@ -46,7 +44,7 @@ pub fn install_ssr(
     sleep(Duration::new(5, 0));
     // println!("🚀 延迟5秒");
 
-    let session = connect_ssh(ip_address);
+    let session = connect_ssh(ip_address, app);
 
     // upload_bbr(&session);
     // println!("🚀 重启");
@@ -88,7 +86,7 @@ fn upload_bbr(session: &Session) {
 }
 
 /// 安装启动 ssr 服务
-fn install_shadowsock(session: &Session, app: tauri::AppHandle) {
+fn install_shadowsock(session: &Session, config: &Config) {
     let local_path = app
         .path_resolver()
         .resolve_resource("install_shadowsocks.sh")

@@ -2,8 +2,12 @@ use std::{error::Error, thread::sleep, time::Duration};
 
 use chrono::{Duration as chronoDuration, Utc};
 use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 
-use crate::rpc::instance::{check_instance_run, create_instance};
+use crate::{
+    manage::config::Config,
+    rpc::instance::{check_instance_run, create_instance},
+};
 
 use super::client::ClientCore;
 
@@ -154,6 +158,7 @@ pub fn open_security_port(
     security_group_id: String,
     vpc_id: String,
     zone_id: String,
+    config: &Config,
 ) -> Result<(String, String), Box<dyn Error>> {
     let port = String::from("33333");
     let portPre = port[0..port.len() - 1].to_string();
@@ -271,7 +276,7 @@ pub fn open_security_port(
     //     .unwrap().to_string();
 
     // 创建实例
-    let res = create_instance(client, &zone_id, &security_group_id, &VSwitchId)?;
+    let res = create_instance(client, &zone_id, &security_group_id, &VSwitchId, &config)?;
 
     let instance_id = res.InstanceIdSet[0].clone();
 
