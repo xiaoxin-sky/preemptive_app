@@ -48,11 +48,11 @@ fn open_ss(state: tauri::State<'_, MyState>, app: tauri::AppHandle) -> String {
 
 #[tauri::command]
 fn close_ss(state: tauri::State<'_, MyState>) -> bool {
-    tauri::api::process::kill_children();
-    return match state.0.lock().unwrap().as_ref() {
-        Some(_) => true,
-        None => false,
-    };
+    let child = state.0.lock().unwrap().take();
+    match child.unwrap().kill() {
+        Ok(_) => true,
+        Err(_) => false,
+    }
 }
 
 #[tauri::command]
