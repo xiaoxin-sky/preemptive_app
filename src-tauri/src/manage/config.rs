@@ -28,16 +28,16 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(app: tauri::AppHandle) -> Config {
+    pub fn new(app: &tauri::AppHandle) -> Config {
         let config_path = resolve_path(
             &app.config(),
             app.package_info(),
             &app.env(),
             ".ss_config/config.json",
-            Some(BaseDirectory::App),
+            Some(BaseDirectory::Home),
         )
         .expect("配置文件路径获取失败");
-        let configurable_map = Config::get_config(config_path);
+        let configurable_map = Config::get_config(&config_path);
 
         Config {
             configurable_map,
@@ -69,24 +69,24 @@ impl Config {
     }
 
     fn storage(&self) {
-        let config_file_path = self.config_path;
-        fs::remove_file(self.config_path);
+        fs::remove_file(&self.config_path).unwrap_or(());
 
+        println!("配置地址{:?}", &self.config_path);
         let mut file = match OpenOptions::new()
             .read(true)
             .write(true)
             .create(true)
-            .open(config_file_path)
+            .open(&self.config_path)
         {
             Ok(file) => file,
-            Err(_) => File::create(config_file_path).expect("创建文件失败"),
+            Err(_) => File::create(&self.config_path).expect("创建文件失败"),
         };
 
         let config = serde_json::to_string(&self.configurable_map).expect("转换 JSON 失败");
         file.write(config.as_bytes()).expect("写入失败");
     }
 
-    fn get_config(config_path: PathBuf) -> HashMap<ConfigKey, String> {
+    fn get_config(config_path: &PathBuf) -> HashMap<ConfigKey, String> {
         match File::open(config_path) {
             Ok(mut file) => {
                 println!("文件地址{:?}", file);

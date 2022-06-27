@@ -3,12 +3,19 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    sync::{mpsc::Receiver, Mutex},
+};
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
 use tauri::{
-    api::{path, process::CommandChild},
+    api::{
+        path,
+        process::{Command, CommandChild},
+    },
     generate_context, Manager,
 };
 
@@ -30,29 +37,24 @@ struct SaveConfigPalLoad {
     password: String,
 }
 
-struct MyState {
-    child: Mutex<Option<CommandChild>>,
-}
+#[derive(Default)]
+struct MyState(Mutex<Option<CommandChild>>);
 
 #[tauri::command]
-fn open_ss(state: tauri::State<MyState>, app: tauri::AppHandle) -> String {
-    start_ssr_local(app);
+fn open_ss(state: tauri::State<'_, MyState>, app: tauri::AppHandle) -> String {
+    *state.0.lock().unwrap() = Some(start_ssr_local(app));
     return "ok".to_string();
 }
 
 #[tauri::command]
-fn close_ss(state: tauri::State<MyState>) -> bool {
-    true
-    // let a = state.child.lock().unwrap();
-    // a.unwrap().as_ref().kill();
-    // match state.child.lock().unwrap().as_mut() {
-    //     Some(child) => match child.kill() {
-    //         Ok(_) => true,
-    //         Err(_) => false,
-    //     },
-    //     None => false,
-    // }
+fn close_ss(state: tauri::State<'_, MyState>) -> bool {
+    tauri::api::process::kill_children();
+    return match state.0.lock().unwrap().as_ref() {
+        Some(_) => true,
+        None => false,
+    };
 }
+
 #[tauri::command]
 fn create_instance(app: tauri::AppHandle) -> String {
     match start_server(app) {
@@ -66,24 +68,23 @@ fn main() {
 
     tauri::Builder::default()
         .setup(|app| {
-            // let id = app.listen_global("saveConfig", move |event| {
-            //     let payLoad: SaveConfigPalLoad =
-            //         serde_json::from_str(event.payload().unwrap()).unwrap();
-            //     println!("收到事件 {:?}", payLoad);
-            //     let mut config = Config::new(app.app_handle());
-            //     config.init(
-            //         payLoad.access_key_id,
-            //         payLoad.access_key_secret,
-            //         payLoad.release_time,
-            //         payLoad.password,
-            //     );
-            // });
+            let config = RefCell::new(Config::new(&app.app_handle()));
+
+            let id = app.listen_global("saveConfig", move |event| {
+                let pay_load: SaveConfigPalLoad =
+                    serde_json::from_str(event.payload().unwrap()).unwrap();
+                println!("收到事件 {:?}", pay_load);
+                config.borrow_mut().init(
+                    pay_load.access_key_id,
+                    pay_load.access_key_secret,
+                    pay_load.release_time,
+                    pay_load.password,
+                );
+            });
 
             Ok(())
         })
-        .manage(MyState {
-            child: Mutex::new(None),
-        })
+        .manage(MyState(Default::default()))
         .invoke_handler(tauri::generate_handler![open_ss, close_ss, create_instance])
         .menu(tauri::Menu::os_default(&context.package_info().name))
         .run(context)
