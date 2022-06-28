@@ -60,6 +60,7 @@ pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
 pub fn start_ssr_local(app: tauri::AppHandle) -> CommandChild {
     let window = app.get_window("main").unwrap();
     let config = Config::new(&app);
+    let ip = config.get_config_by_key(ConfigKey::ip);
 
     let path = File::open(config.config_path);
     window
@@ -67,7 +68,6 @@ pub fn start_ssr_local(app: tauri::AppHandle) -> CommandChild {
         .expect("failed to emit event");
 
     let (transmitter, receiver) = mpsc::channel();
-
     tauri::async_runtime::spawn(async move {
         let (mut rx, child) = Command::new_sidecar("sslocal")
             .expect("failed to setup `sslocal` sidecar")
@@ -75,8 +75,7 @@ pub fn start_ssr_local(app: tauri::AppHandle) -> CommandChild {
                 "-b",
                 "127.0.0.1:1081",
                 "-s",
-                // format!("{}:33330", ip).as_str(),
-                "8.219.91.116:33330",
+                format!("{}:33330", ip).as_str(),
                 "-k",
                 "xiaoze123",
                 "-m",
