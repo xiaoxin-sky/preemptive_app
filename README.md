@@ -4,8 +4,8 @@
 
 ### 基础用法
 1. 配置：mac 直接下载 release 包，安装配置好阿里云密钥即可
-2. 开启翻墙：创建实例完成后，点开启按钮即可创建翻墙进程，翻墙子程序监听本地 127.0.0.1:1081 
-3. 配置 chrome `Proxy SwitchyOmega` 浏览器插件. auto switch 中配置规则，规则地址：https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt
+2. 开启翻墙：创建实例完成后，点开启按钮即可创建翻墙进程，翻墙子程序监听本地 127.0.0.1:1081 ，
+3. 配置 chrome `Proxy SwitchyOmega` 浏览器插件. proxy 协议选择SOCKET5， auto switch 中配置规则，规则地址：https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt
 
 ### 阿里云配置教程
 配置教程参见 https://github.com/rockswang/alispot/blob/master/README.md

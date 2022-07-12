@@ -32,7 +32,7 @@ impl ClientCore {
         R: DeserializeOwned,
     {
         let res = self.rpc_client.get(action).query(params).send()?;
-        println!("原始数据{}", &res[0..4]);
+        println!("原始数据{}", &res[0..10]);
         let a: R = serde_json::from_str(res.as_str())?;
         Ok(a)
     }
