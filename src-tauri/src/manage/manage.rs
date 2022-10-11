@@ -18,7 +18,7 @@ use tauri::{
 pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
     let mut config = Config::new(&app);
     let now = Instant::now();
-    let region_id = "ap-southeast-1";
+    let region_id = "cn-hongkong";
     let client = ClientCore::new(
         config.get_config_by_key(ConfigKey::access_key_id),
         config.get_config_by_key(ConfigKey::access_key_secret),

@@ -97,14 +97,14 @@ pub fn create_instance(
     let res: RunInstancesResponse = client.request(
         "RunInstances",
         &[
-            ("RegionId", "ap-southeast-1"),
+            ("RegionId", "cn-hongkong"),
             ("ImageId", "centos_7_06_64_20G_alibase_20190711.vhd"),
             ("InstanceType", "ecs.xn4.small"),
             ("InternetChargeType", "PayByTraffic"),
             ("SystemDisk.Size", "20"),
             ("SystemDisk.Category", "cloud_efficiency"),
             ("SpotStrategy", "SpotAsPriceGo"),
-            ("ZoneId", zone_id),
+            // ("ZoneId", zone_id),
             ("SecurityGroupId", security_group_id),
             ("VSwitchId", vswitch_id),
             ("InstanceName", "alispotCreatedInstance"),
