@@ -21,7 +21,7 @@ aliyun-openapi-core-rust-sdk = "0.3.0"
 serde_json = "1.0.81"
 chrono = "0.4.19"
 ssh2 = "0.9.3"
-ctrlc = "3.2.2"
+# ctrlc = "3.2.2"
 
 [features]
 # by default Tauri runs in production mode
