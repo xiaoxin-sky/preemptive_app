@@ -20,7 +20,7 @@ jobs:
 
       - name: install pkg
         run: |
-            pnpm install
+            npm install
             npm run tauri build
       - name: upload
         uses: actions/upload-artifact@v3
