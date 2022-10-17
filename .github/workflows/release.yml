@@ -17,10 +17,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
 
       - name: install pkg
         run: |
-            npm install
+            pnpm install
             npm run tauri build
       - name: upload
         uses: actions/upload-artifact@v3
