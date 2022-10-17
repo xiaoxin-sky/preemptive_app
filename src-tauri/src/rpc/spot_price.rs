@@ -29,7 +29,7 @@ pub fn get_low_price_spot(
     let res: Response = client.request(
         "DescribeSpotPriceHistory",
         &[
-            ("RegionId", "cn-hongkong"),
+            ("RegionId", "ap-southeast-1"),
             ("NetworkType", "vpc"),
             ("InstanceType", "ecs.xn4.small"),
         ],
