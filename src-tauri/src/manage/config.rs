@@ -97,8 +97,15 @@ impl Config {
                 res
             }
             Err(err) => {
-                println!("打开config.json失败{:?}", err);
-                HashMap::new()
+                println!("打开config.json失败{:?}---{:?}", err, config_path);
+                let mut config = HashMap::<ConfigKey, String>::new();
+                config.insert(ConfigKey::access_key_id, String::new());
+                config.insert(ConfigKey::access_key_secret, String::new());
+                config.insert(ConfigKey::release_time, String::new());
+                config.insert(ConfigKey::ip, String::new());
+                config.insert(ConfigKey::password, String::new());
+                
+                config
             }
         }
     }

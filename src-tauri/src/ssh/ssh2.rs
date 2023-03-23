@@ -1,7 +1,6 @@
 use ssh2::{File, Session, Stream};
 use std::io::{self, prelude::*, BufReader};
 use std::net::TcpStream;
-use std::os::macos::fs::MetadataExt;
 use std::path::Path;
 use std::str::FromStr;
 use std::thread::sleep;
@@ -123,7 +122,12 @@ fn upload_file(session: &Session, file_path: &str, server_path: &str) {
     let dataMate = file.metadata().unwrap();
 
     let mut remote_file = sess
-        .scp_send(Path::new(server_path), 0o644, dataMate.st_size(), None)
+        .scp_send(
+            Path::new(server_path),
+            0o644,
+            get_file_size(&dataMate),
+            None,
+        )
         .expect("远程文件创建出错");
     let mut buffer_reader = BufReader::new(file);
 
@@ -135,4 +139,22 @@ fn upload_file(session: &Session, file_path: &str, server_path: &str) {
     remote_file.wait_eof().unwrap();
     remote_file.close().unwrap();
     remote_file.wait_close().unwrap();
+}
+
+#[cfg(unix)]
+fn get_file_size(dataMate: &Metadata) -> u64 {
+    use std::os::unix::fs::MetadataExt;
+    metadata.size()
+}
+
+#[cfg(windows)]
+fn get_file_size(metadata: &std::fs::Metadata) -> u64 {
+    use std::os::windows::fs::MetadataExt;
+    metadata.file_size()
+}
+
+#[cfg(linux)]
+fn get_file_size(metadata: &Metadata) -> u64 {
+    use std::os::linux::fs::MetadataExt;
+    metadata.st_size()
 }
