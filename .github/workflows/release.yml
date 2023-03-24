@@ -1,35 +1,33 @@
-name: 'publish'
+name: "publish"
 on:
   push:
     branches:
       - release
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
+  qemu:
+    name: build on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
     strategy:
-      fail-fast: false
       matrix:
-        platform: [macos-latest, windows-latest]
-
-    runs-on: ${{ matrix.platform }}
+        os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v3
-      - name: setup node
-        uses: actions/setup-node@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v1
         with:
           node-version: 16
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: install frontend dependencies
-        run: yarn install # change this to npm or pnpm depending on which one you use
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
         with:
-          tagName: preemptive_app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'preemptive_app'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          version: 7.30.0
+
+      - name: install pkg
+        run: |
+          pnpm install
+          npm run tauri build
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ github.workspace }}/src-tauri/target/release/preemptive_app
+          retention-days: 1
