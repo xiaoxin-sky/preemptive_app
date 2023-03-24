@@ -14,3 +14,6 @@
 ### 感谢
 本项目来自于 https://github.com/rockswang/alispot 项目, 使用 rust 开发，完成 mac 版本。
 本项目的特性，目前不开启 bbr，创建实例百分百成功，日常浏览页面速度可观。
+
+### 预览
+![屏幕截图 2023-03-24 143749](https://user-images.githubusercontent.com/42181585/227444391-be752517-b0be-4dd6-a8a5-1b01c42a91b2.png)
