@@ -30,6 +30,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: |
-          ${{ github.workspace }}/src-tauri/target/release/preemptive_app*
-          ${{ github.workspace }}/src-tauri/target/release/sslocal*
-          retention-days: 1
+            ${{ github.workspace }}/src-tauri/target/release/preemptive_app*
+            ${{ github.workspace }}/src-tauri/target/release/sslocal*
