@@ -1,4 +1,4 @@
-use ssh2::{File, Session, Stream};
+use ssh2::{Channel, File, Session, Stream};
 use std::io::{self, prelude::*, BufReader};
 use std::net::TcpStream;
 use std::path::Path;
@@ -99,6 +99,8 @@ fn install_shadowsock(session: &Session, app: &AppHandle) {
     let sess = session;
     let mut channel = sess.channel_session().unwrap();
 
+    install_dos2unix(session, server_path);
+
     let mut command = String::new();
     command.push_str("chmod +x ");
     command.push_str(server_path);
@@ -111,6 +113,17 @@ fn install_shadowsock(session: &Session, app: &AppHandle) {
     println!("{}", s);
     channel.close().unwrap();
     println!("✅ 执行 ssr 启动成功{}", channel.exit_status().unwrap());
+}
+
+/// 安装 windows shell 解析
+fn install_dos2unix(sess: &Session, server_path: &str) {
+    sess.channel_session()
+        .expect("channel 获取失败")
+        .exec(&format!(
+            "yum -y install dos2unix && dos2unix {}",
+            server_path
+        ))
+        .expect("安装dos2unix失败");
 }
 
 /// 向服务器上传文件
