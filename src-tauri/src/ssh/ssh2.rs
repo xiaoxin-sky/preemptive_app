@@ -156,7 +156,7 @@ fn upload_file(session: &Session, file_path: &str, server_path: &str) {
 
 #[cfg(unix)]
 fn get_file_size(dataMate: &Metadata) -> u64 {
-    use std::os::unix::fs::MetadataExt;
+    use std::os::macos::fs::MetadataExt;
     metadata.size()
 }
 
