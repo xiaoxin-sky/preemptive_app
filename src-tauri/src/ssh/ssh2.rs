@@ -1,8 +1,7 @@
-use ssh2::{Channel, File, Session, Stream};
+use ssh2::{Session, Stream};
 use std::io::{self, prelude::*, BufReader};
 use std::net::TcpStream;
 use std::path::Path;
-use std::str::FromStr;
 use std::thread::sleep;
 use std::time::Duration;
 use std::{fs, thread};
@@ -132,42 +131,27 @@ fn upload_file(session: &Session, file_path: &str, server_path: &str) {
 
     println!("🐟开始上传 {}->{}", file_path, server_path);
     let file = fs::File::open(file_path).expect("❌文件不存在");
-    let dataMate = file.metadata().unwrap();
+    // let dataMate = file.metadata().unwrap();
+
+    let mut buffer_reader = BufReader::new(file);
+
+    let mut content = String::new();
+    let size = match buffer_reader.read_to_string(&mut content) {
+        Ok(size) => size,
+        Err(_) => panic!("读取文件出错"),
+    };
 
     let mut remote_file = sess
         .scp_send(
             Path::new(server_path),
             0o644,
-            get_file_size(&dataMate),
+            size.try_into().unwrap(),
             None,
         )
         .expect("远程文件创建出错");
-    let mut buffer_reader = BufReader::new(file);
-
-    let mut content = String::new();
-    buffer_reader.read_to_string(&mut content);
-
     remote_file.write(&content.as_bytes());
     remote_file.send_eof().unwrap();
     remote_file.wait_eof().unwrap();
     remote_file.close().unwrap();
     remote_file.wait_close().unwrap();
-}
-
-#[cfg(unix)]
-fn get_file_size(dataMate: &Metadata) -> u64 {
-    use std::os::macos::fs::MetadataExt;
-    metadata.size()
-}
-
-#[cfg(windows)]
-fn get_file_size(metadata: &std::fs::Metadata) -> u64 {
-    use std::os::windows::fs::MetadataExt;
-    metadata.file_size()
-}
-
-#[cfg(linux)]
-fn get_file_size(metadata: &Metadata) -> u64 {
-    use std::os::linux::fs::MetadataExt;
-    metadata.st_size()
 }
