@@ -11,6 +11,7 @@ use std::{
 
 use manage::manage::start_server;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use tauri::{
     api::{
         path,
@@ -71,15 +72,21 @@ fn main() {
             let config = RefCell::new(Config::new(&app.app_handle()));
 
             let id = app.listen_global("saveConfig", move |event| {
-                let pay_load: SaveConfigPalLoad =
-                    serde_json::from_str(event.payload().unwrap()).unwrap();
-                println!("收到事件 {:?}", pay_load);
-                config.borrow_mut().init(
-                    pay_load.access_key_id,
-                    pay_load.access_key_secret,
-                    pay_load.release_time,
-                    pay_load.password,
-                );
+                let data = event.payload().expect("Failed to get payload");
+                let parsed: Result<Value, _> = serde_json::from_str(&data);
+            
+                if let Ok(Value::String(st)) = parsed {
+                    let pay_load = serde_json::from_str::<SaveConfigPalLoad>(&st)
+                        .expect("Failed to parse payload JSON");
+                    config.borrow_mut().init(
+                        pay_load.access_key_id,
+                        pay_load.access_key_secret,
+                        pay_load.release_time,
+                        pay_load.password,
+                    );
+                } else {
+                    println!("Invalid JSON payload");
+                }
             });
 
             Ok(())
