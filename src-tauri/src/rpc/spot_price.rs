@@ -31,7 +31,7 @@ pub fn get_low_price_spot(
         &[
             ("RegionId", "ap-southeast-1"),
             ("NetworkType", "vpc"),
-            ("InstanceType", "ecs.xn4.small"),
+            ("InstanceType", "ecs.t5-lc2m1.nano"),
         ],
     )?;
     // let res: Response = serde_json::from_str(&response)?;

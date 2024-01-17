@@ -23,8 +23,9 @@ pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
         config.get_config_by_key(ConfigKey::access_key_id),
         config.get_config_by_key(ConfigKey::access_key_secret),
     );
-    let spot_obj = spot_price::get_low_price_spot(&client)?.expect("没有找到 spot ");
-    println!("spot 信息{:#?}", spot_obj);
+    // let spot_obj = spot_price::get_low_price_spot(&client)?.expect("没有找到 spot ");
+    // println!("spot 信息{:#?}", spot_obj);
+    let zone_id = "ap-southeast-1c".to_string();
 
     let res = security_group::get_security_groups(&client, region_id)?;
     println!("安全组信息{:#?}", res);
@@ -34,7 +35,7 @@ pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
         String::from(region_id),
         res.SecurityGroupId,
         res.VpcId,
-        spot_obj.ZoneId,
+        zone_id,
         &config,
     )?;
     println!("实例 id->{} ip_address->{}", instance_id, ip_address);
