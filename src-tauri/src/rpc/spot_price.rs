@@ -25,11 +25,12 @@ pub struct Response {
 /// 获取最小价格
 pub fn get_low_price_spot(
     client: &ClientCore,
+    region:&str
 ) -> Result<Option<SpotPriceType>, Box<dyn std::error::Error>> {
     let res: Response = client.request(
         "DescribeSpotPriceHistory",
         &[
-            ("RegionId", "ap-southeast-1"),
+            ("RegionId", region),
             ("NetworkType", "vpc"),
             ("InstanceType", "ecs.t5-lc2m1.nano"),
         ],

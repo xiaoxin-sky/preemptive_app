@@ -18,6 +18,7 @@ const saveHandle = (val: IConfig) => {
   let newVal = JSON.stringify(val);
   localStorage.setItem("config", newVal);
   config_storage.value = newVal;
+  console.log(val)
   appWindow.emit("saveConfig", val);
 };
 const val = ref<string[]>([]);

@@ -87,6 +87,7 @@ pub struct RunInstancesResponse {
 /// 创建实例
 pub fn create_instance(
     client: &ClientCore,
+    region:&str,
     zone_id: &str,
     security_group_id: &str,
     vswitch_id: &str,
@@ -97,7 +98,7 @@ pub fn create_instance(
     let res: RunInstancesResponse = client.request(
         "RunInstances",
         &[
-            ("RegionId", "ap-southeast-1"),
+            ("RegionId", region),
             ("ImageId", "centos_7_06_64_20G_alibase_20190711.vhd"),
             ("InstanceType", "ecs.t5-lc2m1.nano"),
             ("InternetChargeType", "PayByTraffic"),

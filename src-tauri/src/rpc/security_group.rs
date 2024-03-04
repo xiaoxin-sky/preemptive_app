@@ -276,7 +276,14 @@ pub fn open_security_port(
     //     .unwrap().to_string();
 
     // 创建实例
-    let res = create_instance(client, &zone_id, &security_group_id, &VSwitchId, &config)?;
+    let res = create_instance(
+        client,
+        &region_id,
+        &zone_id,
+        &security_group_id,
+        &VSwitchId,
+        &config,
+    )?;
 
     let instance_id = res.InstanceIdSet[0].clone();
 

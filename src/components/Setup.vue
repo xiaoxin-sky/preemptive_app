@@ -1,3 +1,36 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+
+export interface IConfig {
+  access_key_id: string;
+  access_key_secret: string;
+  release_time: string;
+  password: string;
+  region: string;
+  zone_id: string;
+}
+
+const modelRef = ref<IConfig>(
+  localStorage.getItem("config") !== null
+    ? JSON.parse(localStorage.getItem("config")!)
+    : {
+        access_key_id: "",
+        access_key_secret: "",
+        release_time: "",
+        password: "",
+        region: "",
+        zone_id: "",
+      }
+);
+
+const emit = defineEmits<{ (e: "save", val: IConfig): void }>();
+
+const onFinish = () => {
+  emit("save", modelRef.value);
+};
+const onFinishFailed = () => {};
+</script>
+
 <template>
   <div class="form-warp">
     <a-form
@@ -33,6 +66,16 @@
       >
         <a-input v-model:value="modelRef.release_time" />
       </a-form-item>
+      <a-form-item
+        label="地域"
+        name="release_time"
+        :rules="[{ required: true }]"
+      >
+        <a-input v-model:value="modelRef.region" />
+      </a-form-item>
+      <a-form-item label="可用区" name="zone_id" :rules="[{ required: true }]">
+        <a-input v-model:value="modelRef.zone_id" />
+      </a-form-item>
 
       <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
         <a-button type="primary" html-type="submit">保存</a-button>
@@ -40,35 +83,6 @@
     </a-form>
   </div>
 </template>
-
-<script lang="ts" setup>
-import { ref } from "vue";
-
-export interface IConfig {
-  access_key_id: string;
-  access_key_secret: string;
-  release_time: string;
-  password: string;
-}
-
-const modelRef = ref<IConfig>(
-  localStorage.getItem("config") !== null
-    ? JSON.parse(localStorage.getItem("config")!)
-    : {
-        access_key_id: "",
-        access_key_secret: "",
-        release_time: "",
-        password: "",
-      }
-);
-
-const emit = defineEmits<{ (e: "save", val: IConfig): void }>();
-
-const onFinish = () => {
-  emit("save", modelRef.value);
-};
-const onFinishFailed = () => {};
-</script>
 
 <style scoped>
 .form-warp {

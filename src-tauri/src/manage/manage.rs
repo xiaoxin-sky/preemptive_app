@@ -18,14 +18,14 @@ use tauri::{
 pub fn start_server(app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
     let mut config = Config::new(&app);
     let now = Instant::now();
-    let region_id = "ap-southeast-1";
+    let region_id = &config.get_config_by_key(ConfigKey::region);
     let client = ClientCore::new(
         config.get_config_by_key(ConfigKey::access_key_id),
         config.get_config_by_key(ConfigKey::access_key_secret),
     );
     // let spot_obj = spot_price::get_low_price_spot(&client)?.expect("没有找到 spot ");
     // println!("spot 信息{:#?}", spot_obj);
-    let zone_id = "ap-southeast-1c".to_string();
+    let zone_id = config.get_config_by_key(ConfigKey::zone_id);
 
     let res = security_group::get_security_groups(&client, region_id)?;
     println!("安全组信息{:#?}", res);
