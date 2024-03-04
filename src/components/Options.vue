@@ -47,6 +47,17 @@ const state = reactive<{ state: InstanceState; msg: string }>({
   msg: "暂无实例",
 });
 
+const currentIp = ref("");
+
+onMounted(() => {
+  const instance_info = localStorage.getItem("instance_info");
+  if (instance_info) {
+    const info = JSON.parse(instance_info);
+    currentIp.value = info.ip;
+    state.msg = info.ip;
+  }
+});
+
 const createHandle = async () => {
   state.state = InstanceState.Creating;
   state.msg = "创建中...";
@@ -64,6 +75,7 @@ const createHandle = async () => {
   localStorage.setItem("instance_info", JSON.stringify({ ip }));
   state.state = InstanceState.Closed;
   state.msg = ip;
+  currentIp.value = ip;
 };
 
 onMounted(() => {
@@ -85,6 +97,7 @@ onMounted(() => {
       <a-button type="error" @click="optionHandle(OnOff.close)">关闭</a-button>
     </div>
     <h2>当前状态</h2>
+    <p>当前ip：{{ currentIp }}</p>
     <p>{{ state.msg }}</p>
     <a-progress
       type="circle"
