@@ -100,7 +100,7 @@ pub fn create_instance(
         &[
             ("RegionId", region),
             ("ImageId", "centos_7_06_64_20G_alibase_20190711.vhd"),
-            ("InstanceType", "ecs.t5-lc2m1.nano"),
+            ("InstanceType", "ecs.n1.tiny"),
             ("InternetChargeType", "PayByTraffic"),
             ("SystemDisk.Size", "20"),
             ("SystemDisk.Category", "cloud_efficiency"),
