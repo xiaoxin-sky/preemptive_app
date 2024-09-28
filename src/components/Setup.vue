@@ -8,6 +8,7 @@ export interface IConfig {
   password: string;
   region: string;
   zone_id: string;
+  instance_type: string;
 }
 
 const modelRef = ref<IConfig>(
@@ -20,6 +21,7 @@ const modelRef = ref<IConfig>(
         password: "",
         region: "",
         zone_id: "",
+        instance_type: "",
       }
 );
 
@@ -75,6 +77,9 @@ const onFinishFailed = () => {};
       </a-form-item>
       <a-form-item label="可用区" name="zone_id" :rules="[{ required: true }]">
         <a-input v-model:value="modelRef.zone_id" />
+      </a-form-item>
+      <a-form-item label="机器类型" name="zone_id" :rules="[{ required: true }]">
+        <a-input v-model:value="modelRef.instance_type" />
       </a-form-item>
 
       <a-form-item :wrapper-col="{ offset: 8, span: 16 }">

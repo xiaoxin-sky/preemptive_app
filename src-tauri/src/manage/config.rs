@@ -21,7 +21,8 @@ pub enum ConfigKey {
     password,
     ip,
     region,
-    zone_id
+    zone_id,
+    instance_type,
 }
 
 pub struct Config {
@@ -55,6 +56,7 @@ impl Config {
         password: String,
         region: String,
         zone_id: String,
+        instance_type:String,
     ) {
         self.configurable_map
             .insert(ConfigKey::access_key_id, access_key_id);
@@ -65,6 +67,7 @@ impl Config {
         self.configurable_map.insert(ConfigKey::password, password);
         self.configurable_map.insert(ConfigKey::region, region);
         self.configurable_map.insert(ConfigKey::zone_id, zone_id);
+        self.configurable_map.insert(ConfigKey::instance_type, instance_type);
         self.storage();
     }
 

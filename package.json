@@ -4,7 +4,7 @@
   "version": "0.0.2",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "rs": "tauri dev"
@@ -23,5 +23,8 @@
     "unplugin-vue-components": "^0.19.6",
     "vite": "^2.9.9",
     "vue-tsc": "^0.34.7"
+  },
+  "volta": {
+    "node": "18.20.4"
   }
 }

@@ -93,14 +93,14 @@ pub fn create_instance(
     vswitch_id: &str,
     config: &Config,
 ) -> Result<InstanceIdSets, Box<dyn Error>> {
-    println!("开始创建实例-{}--{}--{}",zone_id,security_group_id,vswitch_id);
+    println!("开始创建实例-{}--{}--{}--{}",zone_id,security_group_id,vswitch_id,config.get_config_by_key(ConfigKey::instance_type).as_str());
     // 创建实例
     let res: RunInstancesResponse = client.request(
         "RunInstances",
         &[
             ("RegionId", region),
             ("ImageId", "centos_7_06_64_20G_alibase_20190711.vhd"),
-            ("InstanceType", "ecs.n1.tiny"),
+            ("InstanceType", config.get_config_by_key(ConfigKey::instance_type).as_str()),
             ("InternetChargeType", "PayByTraffic"),
             ("SystemDisk.Size", "20"),
             ("SystemDisk.Category", "cloud_efficiency"),

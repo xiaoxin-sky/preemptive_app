@@ -38,6 +38,7 @@ struct SaveConfigPalLoad {
     password: String,
     region: String,
     zone_id: String,
+    instance_type: String,
 }
 
 #[derive(Default)]
@@ -75,22 +76,42 @@ fn main() {
 
             let id = app.listen_global("saveConfig", move |event| {
                 let data = event.payload().expect("Failed to get payload");
-                let parsed: Result<Value, _> = serde_json::from_str(&data);
-
-                if let Ok(Value::String(st)) = parsed {
-                    let pay_load = serde_json::from_str::<SaveConfigPalLoad>(&st)
-                        .expect("Failed to parse payload JSON");
-                    config.borrow_mut().init(
-                        pay_load.access_key_id,
-                        pay_load.access_key_secret,
-                        pay_load.release_time,
-                        pay_load.password,
-                        pay_load.region,
-                        pay_load.zone_id,
-                    );
-                } else {
-                    println!("Invalid JSON payload");
+                match serde_json::from_str::<SaveConfigPalLoad>(data) {
+                    Ok(pay_load) => {
+                        println!("{:?}", pay_load);
+                        config.borrow_mut().init(
+                            pay_load.access_key_id,
+                            pay_load.access_key_secret,
+                            pay_load.release_time,
+                            pay_load.password,
+                            pay_load.region,
+                            pay_load.zone_id,
+                            pay_load.instance_type
+                        );
+                    }
+                    Err(e) => {
+                        println!("{:?}", e);
+                    }
                 }
+
+                // match  {
+                //     Ok(a)=>{
+                //         let pay_load = serde_json::from_str::<SaveConfigPalLoad>(&a)
+                //         .expect("Failed to parse payload JSON");
+                //     config.borrow_mut().init(
+                //         pay_load.access_key_id,
+                //         pay_load.access_key_secret,
+                //         pay_load.release_time,
+                //         pay_load.password,
+                //         pay_load.region,
+                //         pay_load.zone_id,
+                //     );
+                //     }
+                //     Err(e)=>{
+                //         println!("Invalid JSON payload");
+
+                //     }
+                // }
             });
 
             Ok(())
